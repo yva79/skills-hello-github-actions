@@ -6,34 +6,22 @@ _Create and run a GitHub Actions workflow._
 
 </header>
 
-## Step 1: Create a workflow file
+## Step 3: Add a step to your workflow file
 
-_Welcome to "Hello GitHub Actions"! :wave:_
+_Nice work adding a job to your workflow! :dancer:_
 
-**What is _GitHub Actions_?**: GitHub Actions is a flexible way to automate nearly every aspect of your team's software workflow. You can automate testing, continuously deploy, review code, manage issues and pull requests, and much more. The best part, these workflows are stored as code in your repository and easily shared and reused across teams. To learn more, check out these resources:
+Workflows have jobs, and jobs have steps. So now we'll add a step to your workflow.
 
-- The GitHub Actions feature page, see [GitHub Actions](https://github.com/features/actions).
-- The "GitHub Actions" user documentation, see [GitHub Actions](https://docs.github.com/actions).
+**What are _steps_?**: Actions steps run - in the order they are specified, from the top down - when a workflow job is processed. Each step must pass for the next step to run.
 
-**What is a _workflow_?**: A workflow is a configurable automated process that will run one or more jobs. Workflows are defined in special files in the `.github/workflows` directory and they execute based on your chosen event. For this exercise, we'll use a `pull_request` event.
+Each step consists of either a shell script that's executed, or a reference to an action that's run. When we talk about an action (with a lowercase "a") in this context, we mean a reusable unit of code. You can find out about actions in "[Finding and customizing actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions)," but for now we'll use a shell script in our workflow step.
 
-- To read more about workflows, jobs, and events, see "[Understanding GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions)".
-- If you want to learn more about the `pull_request` event before using it, see "[pull_request](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request)".
+Update your workflow to make it post a comment on new pull requests. It will do this using a [bash](https://en.wikipedia.org/wiki/Bash_%28Unix_shell%29) script and [GitHub CLI](https://cli.github.com/).
 
-To get you started, we ran an Actions workflow in your new repository that, among other things, created a branch for you to work in, called `welcome-workflow`.
+### :keyboard: Activity: Add a step to your workflow file
 
-### :keyboard: Activity: Create a workflow file
-
-1. Open a new browser tab, and navigate to this same repository. Then, work on the steps in your second tab while you read the instructions in this tab.
-1. Create a pull request. This will contain all of the changes you'll make throughout this part of the course.
-
-   Click the **Pull Requests** tab, click **New pull request**, set `base: main` and `compare:welcome-workflow`, click **Create pull request**, then click **Create pull request** again.
-
-1. Navigate to the **Code** tab.
-1. From the **main** branch dropdown, click on the **welcome-workflow** branch.
-1. Navigate to the `.github/workflows/` folder, then select **Add file** and click on **Create new file**.
-1. In the **Name your file** field, enter `welcome.yml`.
-1. Add the following content to the `welcome.yml` file:
+1. Still working on the `welcome-workflow` branch, open your `welcome.yml` file.
+1. Update the contents of the file to:
 
    ```yaml copy
    name: Post welcome comment
@@ -42,11 +30,22 @@ To get you started, we ran an Actions workflow in your new repository that, amon
        types: [opened]
    permissions:
      pull-requests: write
+   jobs:
+     build:
+       name: Post welcome comment
+       runs-on: ubuntu-latest
+       steps:
+         - run: gh pr comment $PR_URL --body "Welcome to the repository!"
+           env:
+             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+             PR_URL: ${{ github.event.pull_request.html_url }}
    ```
 
-1. To commit your changes, click **Commit changes**.
-1. Type a commit message, select **Commit directly to the welcome-workflow branch** and click **Commit changes**.
-1. Wait about 20 seconds, then refresh this page (the one you're following instructions from). A separate Actions workflow in the repository (not the workflow you created) will run and will automatically replace the contents of this README file with instructions for the next step.
+   **Note:** The step you've added uses GitHub CLI (`gh`) to add a comment when a pull request is opened. To allow GitHub CLI to post a comment, we set the `GITHUB_TOKEN` environment variable to the value of the `GITHUB_TOKEN` secret, which is an installation access token, created when the workflow runs. For more information, see "[Automatic token authentication](https://docs.github.com/en/actions/security-guides/automatic-token-authentication)." We set the `PR_URL` environment variable to the URL of the newly created pull request, and we use this in the `gh` command.
+   
+1. Click **Commit changes** in the top right of the workflow editor.
+1. Type your commit message and commit your changes directly to your branch.
+1. Wait about 20 seconds, then refresh this page (the one you're following instructions from). Another workflow will run and will replace the contents of this README file with instructions for the next step.
 
 <footer>
 
