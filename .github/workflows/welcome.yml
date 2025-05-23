@@ -5,6 +5,41 @@ on:
 permissions:
   pull-requests: write
 jobs:
+  get_version:
+    name: get version stored in file
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - id: get_version
+        run: |
+          echo "current_version=$(cat ./version.txt)" >> $GITHUB_OUTPUT
+    outputs:
+      current_version: ${{ steps.get_version.outputs.current_version }}
+
+  increment_minor:
+    name: On start
+    needs: get_version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Let's get all the branches.
+
+    name: increment minor version number
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - id: get_version
+        run: |
+          echo "current_version=$(cat ./version.txt)" >> $GITHUB_OUTPUT
+    outputs:
+      current_version: ${{ steps.get_version.outputs.current_version }}
+
+    
+
   build:
     name: Post welcome comment
     runs-on: ubuntu-latest
