@@ -21,17 +21,25 @@ jobs:
           sparse-checkout-cone-mode: false
       - id: get_version
         run: |
+          echo "getting version number"
           version=$(cat ./version.txt)
+          echo "splitting version number"
           version_array=(${version//./ } )
+          echo "incrementing version number"
           ((version_array[1]++))
           ((version_array[2]=0))
-          echo "${version_array[0]}.${version_array[1]}.${version_array[2]})" > ./version.txt
+          echo saving version number"
+          echo "${version_array[0]}.${version_array[1]}.${version_array[2]}" > ./version.txt
+          echo "configuring git"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          echo "pusshing version file"
           git add ./version.txt
           git commit -m "bot-generated"
           git push
-          git tag -a "${version_array[0]}.${version_array[1]}.${version_array[2]})" -m "Initial public release" master
+          echo "setting release"
+          git tag -a "${version_array[0]}.${version_array[1]}.${version_array[2]}" -m "Initial public release" master
           git push --tags
+          echo "end"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
